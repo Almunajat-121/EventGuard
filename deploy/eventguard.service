@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn daemon for EventGuard FastAPI Application
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/eventguard
+Environment="PATH=/home/ubuntu/eventguard/.venv/bin"
+EnvironmentFile=/home/ubuntu/eventguard/.env.production
+ExecStart=/home/ubuntu/eventguard/.venv/bin/gunicorn -k uvicorn.workers.UvicornWorker -c gunicorn_conf.py app.main:app
+
+[Install]
+WantedBy=multi-user.target

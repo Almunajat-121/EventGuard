@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - EventGuard{% endblock %}
+
+{% block nav_items %}
+    <a href="#" id="logoutBtn" class="text-gray-600 hover:text-red-600 px-3 py-2 rounded-md font-medium transition-colors">Logout</a>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+            <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Total Events</h3>
+            <p class="mt-2 text-3xl font-bold text-gray-900" id="totalEvents">-</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+            <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Upcoming Events</h3>
+            <p class="mt-2 text-3xl font-bold text-gray-900" id="upcomingEvents">-</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
+            <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">High Risk Events</h3>
+            <p class="mt-2 text-3xl font-bold text-red-600" id="highRiskEvents">-</p>
+        </div>
+    </div>
+    
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Daftar Acara Anda</h3>
+            <button id="openModalBtn" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition-colors shadow">+ Buat Event</button>
+        </div>
+        <div class="border-t border-gray-200">
+            <ul id="eventList" class="divide-y divide-gray-200 p-4">
+                <li class="py-4 text-center text-gray-500">Memuat data...</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Buat Event -->
+<div id="eventModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex justify-center items-center z-50">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Buat Acara Baru</h3>
+            <button id="closeModalBtn" class="text-gray-400 hover:text-gray-500">&times;</button>
+        </div>
+        <form id="createEventForm" class="p-6 space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Nama Acara</label>
+                <input type="text" id="eventName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Lokasi (Kota)</label>
+                <input type="text" id="eventLocation" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Contoh: Jakarta">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
+                    <input type="date" id="startDate" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tanggal Selesai</label>
+                    <input type="date" id="endDate" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Jam Mulai</label>
+                    <input type="time" id="startTime" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Jam Selesai</label>
+                    <input type="time" id="endTime" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+            </div>
+            <div id="modalError" class="text-red-500 text-sm hidden"></div>
+            <div class="pt-4 flex justify-end">
+                <button type="submit" id="submitEventBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Simpan Acara</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Detail Acara & Risiko -->
+<div id="detailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex justify-center items-center z-50">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+            <h3 class="text-lg font-bold text-gray-900" id="detailTitle">Detail Acara</h3>
+            <button id="closeDetailBtn" class="text-gray-400 hover:text-gray-500 text-2xl">&times;</button>
+        </div>
+        <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+            <div id="detailLoading" class="text-center text-gray-500 hidden">Memuat data...</div>
+            <div id="detailContent" class="hidden space-y-6">
+                <!-- Info Dasar -->
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-gray-500">Waktu Pelaksanaan</p>
+                        <p class="font-medium text-gray-900" id="detailTime"></p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Lokasi</p>
+                        <p class="font-medium text-gray-900" id="detailLocation"></p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <!-- Hasil Analisis Risiko -->
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-3 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Skenario Terburuk (Cuaca)
+                    </h4>
+                    <div id="noRiskData" class="text-sm text-yellow-600 bg-yellow-50 p-3 rounded border border-yellow-200 hidden">
+                        Data cuaca belum diperbarui. Silakan klik "Update Cuaca" pada daftar acara.
+                    </div>
+                    <div id="hasRiskData" class="space-y-4 hidden">
+                        <div class="grid grid-cols-3 gap-3 text-center">
+                            <div class="bg-gray-50 p-3 rounded border">
+                                <p class="text-xs text-gray-500 uppercase">Suhu</p>
+                                <p class="text-lg font-bold" id="detailTemp"></p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded border">
+                                <p class="text-xs text-gray-500 uppercase">Peluang Hujan</p>
+                                <p class="text-lg font-bold" id="detailRain"></p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded border">
+                                <p class="text-xs text-gray-500 uppercase">Kecepatan Angin</p>
+                                <p class="text-lg font-bold" id="detailWind"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">Tingkat Risiko Keseluruhan:</span>
+                                <span id="detailRiskBadge" class="px-3 py-1 rounded-full text-xs font-bold text-white"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r">
+                            <h5 class="text-sm font-bold text-blue-800 mb-1">Rekomendasi Sistem:</h5>
+                            <p class="text-sm text-blue-700" id="detailRecommendation"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Logic Modal
+const modal = document.getElementById('eventModal');
+const openBtn = document.getElementById('openModalBtn');
+const closeBtn = document.getElementById('closeModalBtn');
+
+openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+// Helper load events & summary
+async function reloadDashboard() {
+    // Load summary
+    try {
+        const summaryRes = await fetch('/api/dashboard/summary'); 
+        if (summaryRes.ok) {
+            const summary = await summaryRes.json();
+            document.getElementById('totalEvents').textContent = summary.total_events;
+            document.getElementById('upcomingEvents').textContent = summary.upcoming_events;
+            document.getElementById('highRiskEvents').textContent = summary.high_risk_events;
+        }
+    } catch (e) {
+        console.error("Failed to load summary", e);
+    }
+    
+    // Load events
+    try {
+        const eventsRes = await fetch('/api/events');
+        const eventList = document.getElementById('eventList');
+        
+        if (eventsRes.ok) {
+            const events = await eventsRes.json();
+            if (events.length === 0) {
+                eventList.innerHTML = '<li class="py-4 text-center text-gray-500">Belum ada acara yang ditambahkan.</li>';
+            } else {
+                eventList.innerHTML = events.map(e => `
+                    <li class="py-4 flex justify-between items-center hover:bg-gray-50 px-2 rounded transition">
+                        <div class="cursor-pointer" onclick="viewEventDetail('${e.id}')">
+                            <p class="text-sm font-bold text-blue-600 truncate hover:underline">${e.name}</p>
+                            <p class="text-xs text-gray-500 mt-1">${e.start_date} s.d. ${e.end_date} | ${e.location}</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Jam: ${e.start_time} - ${e.end_time}</p>
+                        </div>
+                        <div class="flex flex-col items-end space-y-2">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${e.forecast_status === 'AVAILABLE' ? 'bg-green-100 text-green-800' : (e.forecast_status === 'TOO_FAR' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800')}">
+                                ${e.forecast_status === 'AVAILABLE' ? 'Data Tersedia' : (e.forecast_status === 'TOO_FAR' ? 'Terlalu Jauh' : 'Sudah Lewat')}
+                            </span>
+                            ${e.forecast_status === 'AVAILABLE' ? `<button onclick="refreshWeather('${e.id}')" class="text-xs text-blue-600 hover:text-blue-800 underline">Update Cuaca</button>` : ''}
+                        </div>
+                    </li>
+                `).join('');
+            }
+        }
+    } catch (e) {
+        console.error("Failed to load events", e);
+    }
+}
+
+// Global func to refresh weather
+window.refreshWeather = async (eventId) => {
+    try {
+        alert("Sedang memperbarui data cuaca...");
+        const res = await fetch(`/api/events/${eventId}/weather/refresh`, { method: 'POST' });
+        if (res.ok) {
+            alert("Berhasil memperbarui data cuaca!");
+            reloadDashboard();
+        } else {
+            const data = await res.json();
+            alert("Gagal: " + (data.detail || "Terjadi kesalahan"));
+        }
+    } catch(e) {
+        alert("Gagal menghubungi server");
+    }
+};
+
+// Form Submission
+document.getElementById('createEventForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitEventBtn');
+    submitBtn.textContent = 'Menyimpan...';
+    submitBtn.disabled = true;
+    
+    const payload = {
+        name: document.getElementById('eventName').value,
+        location: document.getElementById('eventLocation').value,
+        timezone: "Asia/Jakarta",
+        start_date: document.getElementById('startDate').value,
+        end_date: document.getElementById('endDate').value,
+        start_time: document.getElementById('startTime').value + ":00",
+        end_time: document.getElementById('endTime').value + ":00"
+    };
+    
+    const errorDiv = document.getElementById('modalError');
+    errorDiv.classList.add('hidden');
+    
+    try {
+        const res = await fetch('/api/events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        if (res.ok) {
+            modal.classList.add('hidden');
+            document.getElementById('createEventForm').reset();
+            reloadDashboard();
+        } else {
+            const data = await res.json();
+            let errorMsg = 'Gagal menyimpan acara';
+            if (data.detail) {
+                if (Array.isArray(data.detail)) {
+                    errorMsg = data.detail.map(err => err.msg).join(', ');
+                } else {
+                    errorMsg = data.detail;
+                }
+            }
+            errorDiv.textContent = errorMsg;
+            errorDiv.classList.remove('hidden');
+        }
+    } catch (err) {
+        errorDiv.textContent = 'Gagal menghubungi server';
+        errorDiv.classList.remove('hidden');
+    } finally {
+        submitBtn.textContent = 'Simpan Acara';
+        submitBtn.disabled = false;
+    }
+});
+
+// Detail View Logic
+const detailModal = document.getElementById('detailModal');
+const closeDetailBtn = document.getElementById('closeDetailBtn');
+
+closeDetailBtn.addEventListener('click', () => detailModal.classList.add('hidden'));
+
+window.viewEventDetail = async (eventId) => {
+    detailModal.classList.remove('hidden');
+    document.getElementById('detailLoading').classList.remove('hidden');
+    document.getElementById('detailContent').classList.add('hidden');
+    document.getElementById('noRiskData').classList.add('hidden');
+    document.getElementById('hasRiskData').classList.add('hidden');
+    
+    try {
+        // Fetch event details and latest risk
+        const res = await fetch(`/api/events/${eventId}/details`);
+        if (res.ok) {
+            const data = await res.json();
+            
+            document.getElementById('detailTitle').textContent = data.event.name;
+            document.getElementById('detailTime').textContent = `${data.event.start_date} (${data.event.start_time} - ${data.event.end_time})`;
+            document.getElementById('detailLocation').textContent = data.event.location;
+            
+            if (data.risk && data.weather) {
+                document.getElementById('hasRiskData').classList.remove('hidden');
+                document.getElementById('detailTemp').textContent = `${data.weather.temperature || '-'} °C`;
+                document.getElementById('detailRain').textContent = `${(data.weather.rain_probability || 0) * 100} %`;
+                document.getElementById('detailWind').textContent = `${data.weather.wind_speed || '-'} m/s`;
+                
+                const badge = document.getElementById('detailRiskBadge');
+                badge.textContent = data.risk.overall_risk;
+                if (data.risk.overall_risk === 'HIGH') badge.className = 'px-3 py-1 rounded-full text-xs font-bold text-white bg-red-600';
+                else if (data.risk.overall_risk === 'MEDIUM') badge.className = 'px-3 py-1 rounded-full text-xs font-bold text-gray-900 bg-yellow-400';
+                else badge.className = 'px-3 py-1 rounded-full text-xs font-bold text-white bg-green-500';
+                
+                document.getElementById('detailRecommendation').textContent = data.risk.recommendation;
+            } else {
+                document.getElementById('noRiskData').classList.remove('hidden');
+            }
+            
+            document.getElementById('detailLoading').classList.add('hidden');
+            document.getElementById('detailContent').classList.remove('hidden');
+        } else {
+            detailModal.classList.add('hidden');
+            alert("Gagal mengambil detail acara");
+        }
+    } catch(e) {
+        detailModal.classList.add('hidden');
+        alert("Gagal menghubungi server");
+    }
+};
+
+document.addEventListener('DOMContentLoaded', reloadDashboard);
+// Logout
+document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/login';
+});
+</script>
+{% endblock %}

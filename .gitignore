@@ -1,0 +1,47 @@
+# Lingkungan Virtual Python
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# File Byte-compiled / Optimized / DLL
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Variabel Lingkungan & Rahasia
+.env
+.env.*
+!.env.example
+.env.production
+.env.development
+
+# Basis Data Lokal (SQLite)
+*.db
+*.sqlite3
+eventguard.db
+
+# Log
+*.log
+logs/
+
+# Folder Sistem Operasi
+.DS_Store
+Thumbs.db
+
+# Folder Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Folder Python Cache Tambahan
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml

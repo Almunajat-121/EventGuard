@@ -1,0 +1,50 @@
+{
+  "list": [
+    {
+      "dt": 1718769600,
+      "main": {
+        "temp": 32.5,
+        "humidity": 65
+      },
+      "wind": {
+        "speed": 5.2
+      },
+      "clouds": {
+        "all": 40
+      },
+      "pop": 0.2
+    },
+    {
+      "dt": 1718780400,
+      "main": {
+        "temp": 30.1,
+        "humidity": 70
+      },
+      "wind": {
+        "speed": 12.0
+      },
+      "clouds": {
+        "all": 80
+      },
+      "pop": 0.75
+    },
+    {
+      "dt": 1718791200,
+      "main": {
+        "temp": 28.5,
+        "humidity": 85
+      },
+      "wind": {
+        "speed": 16.5
+      },
+      "clouds": {
+        "all": 90
+      },
+      "pop": 0.95
+    }
+  ],
+  "city": {
+    "name": "Mock City",
+    "timezone": 25200
+  }
+}
