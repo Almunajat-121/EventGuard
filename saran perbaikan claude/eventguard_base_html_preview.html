@@ -1,0 +1,279 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .preview-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 10px 0 6px;
+    margin-bottom: 16px;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+
+  /* ── NAVBAR ── */
+  .eg-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+    height: 56px;
+    background: var(--color-background-primary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .eg-nav-left { display: flex; align-items: center; gap: 28px; }
+  .eg-nav-brand {
+    font-size: 16px;
+    font-weight: 500;
+    color: #185FA5;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+  }
+  .eg-nav-brand-icon {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    background: #185FA5;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 14px;
+  }
+  .eg-nav-links { display: flex; gap: 4px; }
+  .eg-nav-link {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    padding: 5px 10px;
+    border-radius: var(--border-radius-md);
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .eg-nav-link:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+  .eg-nav-link.active { color: var(--color-text-primary); font-weight: 500; }
+
+  .eg-nav-right { display: flex; align-items: center; gap: 8px; }
+
+  /* Notif bell */
+  .eg-notif-btn {
+    position: relative;
+    width: 34px; height: 34px;
+    border-radius: var(--border-radius-md);
+    background: transparent;
+    border: 0.5px solid var(--color-border-tertiary);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    font-size: 16px;
+  }
+  .eg-notif-badge {
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 7px; height: 7px;
+    background: #E24B4A;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-background-primary);
+  }
+
+  /* Avatar */
+  .eg-avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #E6F1FB;
+    color: #185FA5;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    border: 0.5px solid #B5D4F4;
+  }
+
+  /* ── NAVBAR DASHBOARD VARIANT ── */
+  .eg-nav-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+    height: 56px;
+    background: var(--color-background-primary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    margin-top: 28px;
+  }
+
+  /* ── TOAST SPECIMENS ── */
+  .toast-section {
+    padding: 24px 1.5rem;
+    background: var(--color-background-secondary);
+    border-top: 0.5px solid var(--color-border-tertiary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .toast-row { display: flex; flex-direction: column; gap: 8px; }
+  .eg-toast {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    border-radius: var(--border-radius-lg);
+    font-size: 13px;
+    font-weight: 400;
+    width: fit-content;
+    border: 0.5px solid transparent;
+  }
+  .eg-toast-success {
+    background: var(--color-background-primary);
+    border-color: var(--color-border-success);
+    color: var(--color-text-success);
+  }
+  .eg-toast-error {
+    background: var(--color-background-primary);
+    border-color: var(--color-border-danger);
+    color: var(--color-text-danger);
+  }
+  .eg-toast-info {
+    background: var(--color-background-primary);
+    border-color: var(--color-border-info);
+    color: var(--color-text-info);
+  }
+  .eg-toast-icon { font-size: 15px; flex-shrink: 0; }
+  .eg-toast-close {
+    margin-left: 8px;
+    font-size: 13px;
+    opacity: 0.5;
+    cursor: pointer;
+  }
+
+  /* ── FOOTER ── */
+  .eg-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 1.5rem;
+    border-top: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-primary);
+    margin-top: 0;
+  }
+  .eg-footer-brand { font-size: 13px; font-weight: 500; color: #185FA5; }
+  .eg-footer-copy { font-size: 12px; color: var(--color-text-tertiary); }
+  .eg-footer-links { display: flex; gap: 16px; }
+  .eg-footer-link { font-size: 12px; color: var(--color-text-tertiary); text-decoration: none; }
+
+  /* ── PAGE SKELETON ── */
+  .page-shell {
+    background: var(--color-background-secondary);
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .page-shell-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    border: 0.5px dashed var(--color-border-secondary);
+    padding: 10px 24px;
+    border-radius: var(--border-radius-md);
+  }
+
+  /* ── SECTION DIVIDER ── */
+  .spec-section {
+    padding: 20px 1.5rem 8px;
+  }
+  .spec-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+</style>
+
+<h2 class="sr-only">Preview struktur base.html EventGuard — navbar publik, navbar dashboard, sistem toast, dan footer</h2>
+
+<div class="preview-label">Navbar — halaman publik (landing, login, register)</div>
+
+<nav class="eg-nav">
+  <div class="eg-nav-left">
+    <a href="#" class="eg-nav-brand">
+      <div class="eg-nav-brand-icon"><i class="ti ti-shield-check" aria-hidden="true"></i></div>
+      EventGuard
+    </a>
+    <div class="eg-nav-links">
+      <a href="#" class="eg-nav-link">Fitur</a>
+      <a href="#" class="eg-nav-link">Harga</a>
+      <a href="#" class="eg-nav-link">Kontak</a>
+    </div>
+  </div>
+  <div class="eg-nav-right">
+    <button class="eg-nav-link" style="border: 0.5px solid var(--color-border-tertiary); background: transparent; cursor: pointer; font-size: 13px; color: var(--color-text-secondary); padding: 5px 14px; border-radius: var(--border-radius-md);">Masuk</button>
+    <button style="background: #185FA5; color: #fff; font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: var(--border-radius-md); border: none; cursor: pointer;">Daftar Gratis</button>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <span class="page-shell-label">{% block content %}{% endblock %}</span>
+</div>
+
+<div class="preview-label" style="margin-top: 24px;">Navbar — halaman dashboard (setelah login)</div>
+
+<nav class="eg-nav-dashboard">
+  <div class="eg-nav-left">
+    <a href="#" class="eg-nav-brand">
+      <div class="eg-nav-brand-icon"><i class="ti ti-shield-check" aria-hidden="true"></i></div>
+      EventGuard
+    </a>
+    <div class="eg-nav-links">
+      <a href="#" class="eg-nav-link active">Dashboard</a>
+      <a href="#" class="eg-nav-link">Acara Saya</a>
+      <a href="#" class="eg-nav-link">Histori Cuaca</a>
+    </div>
+  </div>
+  <div class="eg-nav-right">
+    <button class="eg-notif-btn" aria-label="Notifikasi">
+      <i class="ti ti-bell" aria-hidden="true"></i>
+      <span class="eg-notif-badge"></span>
+    </button>
+    <div class="eg-avatar" title="Profil pengguna">RS</div>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <span class="page-shell-label">{% block content %}{% endblock %}</span>
+</div>
+
+<div class="preview-label" style="margin-top: 24px;">Sistem Toast Notification</div>
+
+<div class="toast-section">
+  <div class="spec-title" style="padding: 0 0 10px;">3 varian — success · error · info</div>
+  <div class="toast-row">
+    <div class="eg-toast eg-toast-success">
+      <i class="ti ti-circle-check eg-toast-icon" aria-hidden="true"></i>
+      <span>Data cuaca berhasil diperbarui untuk acara ini.</span>
+      <i class="ti ti-x eg-toast-close" aria-hidden="true"></i>
+    </div>
+    <div class="eg-toast eg-toast-error">
+      <i class="ti ti-circle-x eg-toast-icon" aria-hidden="true"></i>
+      <span>Gagal mengambil data cuaca. Periksa koneksi Anda.</span>
+      <i class="ti ti-x eg-toast-close" aria-hidden="true"></i>
+    </div>
+    <div class="eg-toast eg-toast-info">
+      <i class="ti ti-info-circle eg-toast-icon" aria-hidden="true"></i>
+      <span>Prakiraan cuaca akan tersedia 5 hari sebelum acara.</span>
+      <i class="ti ti-x eg-toast-close" aria-hidden="true"></i>
+    </div>
+  </div>
+</div>
+
+<div class="preview-label" style="margin-top: 24px;">Footer</div>
+
+<div class="eg-footer">
+  <span class="eg-footer-brand">EventGuard</span>
+  <span class="eg-footer-copy">© 2026 EventGuard. All rights reserved.</span>
+  <div class="eg-footer-links">
+    <a href="#" class="eg-footer-link">Privasi</a>
+    <a href="#" class="eg-footer-link">Syarat</a>
+    <a href="#" class="eg-footer-link">Kontak</a>
+  </div>
+</div>

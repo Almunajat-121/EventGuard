@@ -1,0 +1,229 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .eg-nav { display: flex; justify-content: space-between; align-items: center; padding: 0 2rem; height: 60px; background: var(--color-background-primary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .eg-nav-brand { font-size: 18px; font-weight: 500; color: #185FA5; letter-spacing: -0.3px; }
+  .eg-nav-right { display: flex; gap: 8px; align-items: center; }
+  .eg-nav-link { font-size: 13px; color: var(--color-text-secondary); padding: 6px 12px; border-radius: var(--border-radius-md); text-decoration: none; }
+  .eg-btn-primary { font-size: 13px; font-weight: 500; color: #fff; background: #185FA5; padding: 7px 16px; border-radius: var(--border-radius-md); border: none; cursor: pointer; }
+  .eg-btn-outline { font-size: 13px; font-weight: 500; color: #185FA5; background: transparent; padding: 7px 16px; border-radius: var(--border-radius-md); border: 0.5px solid #B5D4F4; cursor: pointer; }
+
+  .hero { padding: 72px 2rem 64px; max-width: 600px; margin: 0 auto; text-align: center; }
+  .hero-eyebrow { font-size: 12px; font-weight: 500; color: #185FA5; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+  .hero-title { font-size: 36px; font-weight: 500; color: var(--color-text-primary); line-height: 1.2; letter-spacing: -0.5px; margin-bottom: 16px; }
+  .hero-title span { color: #185FA5; }
+  .hero-sub { font-size: 15px; color: var(--color-text-secondary); line-height: 1.7; margin-bottom: 32px; max-width: 460px; margin-left: auto; margin-right: auto; }
+  .hero-actions { display: flex; gap: 10px; justify-content: center; margin-bottom: 48px; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-tertiary); }
+  .hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #639922; }
+
+  .hero-stats { display: flex; justify-content: center; gap: 32px; padding: 20px 2rem; border-top: 0.5px solid var(--color-border-tertiary); border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 64px; }
+  .stat-item { text-align: center; }
+  .stat-num { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .stat-label { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
+
+  .section { padding: 56px 2rem; }
+  .section-label { font-size: 12px; font-weight: 500; color: #185FA5; letter-spacing: 0.08em; text-transform: uppercase; text-align: center; margin-bottom: 8px; }
+  .section-title { font-size: 24px; font-weight: 500; color: var(--color-text-primary); text-align: center; margin-bottom: 8px; letter-spacing: -0.3px; }
+  .section-sub { font-size: 14px; color: var(--color-text-secondary); text-align: center; margin-bottom: 40px; }
+
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--color-border-tertiary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; max-width: 680px; margin: 0 auto; }
+  .feature-cell { background: var(--color-background-primary); padding: 24px; }
+  .feature-icon { width: 36px; height: 36px; border-radius: var(--border-radius-md); background: #E6F1FB; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; color: #185FA5; font-size: 18px; }
+  .feature-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+  .feature-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 680px; margin: 0 auto; }
+  .pricing-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 24px; }
+  .pricing-card.featured { border: 1.5px solid #185FA5; position: relative; }
+  .pricing-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 500; background: #185FA5; color: #fff; padding: 3px 12px; border-radius: 20px; white-space: nowrap; }
+  .pricing-tier { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .pricing-price { font-size: 26px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; letter-spacing: -0.5px; }
+  .pricing-price-sub { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 16px; }
+  .pricing-divider { height: 0.5px; background: var(--color-border-tertiary); margin-bottom: 16px; }
+  .pricing-feature { font-size: 13px; color: var(--color-text-secondary); padding: 5px 0; display: flex; align-items: center; gap: 8px; }
+  .pricing-feature i { color: #185FA5; font-size: 14px; }
+  .pricing-cta { display: block; width: 100%; margin-top: 20px; padding: 9px; border-radius: var(--border-radius-md); font-size: 13px; font-weight: 500; text-align: center; border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); cursor: pointer; }
+  .pricing-cta.primary { background: #185FA5; color: #fff; border-color: transparent; }
+
+  .risk-demo { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 20px; max-width: 480px; margin: 0 auto 40px; }
+  .risk-demo-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 14px; }
+  .risk-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .risk-row:last-child { border-bottom: none; }
+  .risk-label { font-size: 13px; color: var(--color-text-secondary); }
+  .risk-bar-wrap { flex: 1; margin: 0 12px; height: 5px; background: var(--color-border-tertiary); border-radius: 99px; overflow: hidden; }
+  .risk-bar { height: 100%; border-radius: 99px; }
+  .risk-badge { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: var(--border-radius-md); }
+  .badge-high { background: #FCEBEB; color: #A32D2D; }
+  .badge-med { background: #FAEEDA; color: #854F0B; }
+  .badge-low { background: #EAF3DE; color: #3B6D11; }
+  .overall-row { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 0.5px solid var(--color-border-tertiary); }
+  .overall-label { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+
+  .contact-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 28px; max-width: 440px; margin: 0 auto; }
+  .field-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 6px; }
+  .field-input { width: 100%; padding: 8px 10px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); margin-bottom: 14px; }
+  .field-textarea { width: 100%; padding: 8px 10px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); height: 80px; resize: none; margin-bottom: 16px; }
+  .eg-footer { text-align: center; padding: 24px 2rem; border-top: 0.5px solid var(--color-border-tertiary); font-size: 12px; color: var(--color-text-tertiary); }
+</style>
+
+<h2 class="sr-only">Preview desain landing page EventGuard — berisi navbar, hero, fitur, pricing, demo risiko, dan contact</h2>
+
+<nav class="eg-nav">
+  <span class="eg-nav-brand">EventGuard</span>
+  <div class="eg-nav-right">
+    <a href="#" class="eg-nav-link">Fitur</a>
+    <a href="#" class="eg-nav-link">Harga</a>
+    <button class="eg-btn-outline">Masuk</button>
+    <button class="eg-btn-primary">Daftar Gratis</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <p class="hero-eyebrow">Weather Risk Intelligence</p>
+  <h1 class="hero-title">Pantau risiko cuaca<br><span>sebelum terlambat</span></h1>
+  <p class="hero-sub">Sistem peringatan dini cuaca khusus untuk penyelenggara acara outdoor. Analisis risiko otomatis, monitoring setiap 6 jam, notifikasi real-time.</p>
+  <div class="hero-actions">
+    <button class="eg-btn-primary" style="padding: 10px 24px; font-size: 14px;">Mulai Gratis</button>
+    <button class="eg-btn-outline" style="padding: 10px 24px; font-size: 14px;">Lihat Demo</button>
+  </div>
+  <div class="hero-badge">
+    <span class="hero-badge-dot"></span>
+    Tidak perlu kartu kredit · Setup dalam 2 menit
+  </div>
+</div>
+
+<div class="hero-stats">
+  <div class="stat-item"><div class="stat-num">6 jam</div><div class="stat-label">Interval monitoring otomatis</div></div>
+  <div class="stat-item"><div class="stat-num">5 hari</div><div class="stat-label">Jangkauan forecast cuaca</div></div>
+  <div class="stat-item"><div class="stat-num">3 risiko</div><div class="stat-label">Hujan · Angin · Suhu</div></div>
+</div>
+
+<div class="section" style="background: var(--color-background-primary);">
+  <p class="section-label">Fitur</p>
+  <h2 class="section-title">Semua yang dibutuhkan event organizer</h2>
+  <p class="section-sub">Dari pembuatan acara hingga analisis risiko, semuanya otomatis.</p>
+  <div class="features-grid">
+    <div class="feature-cell">
+      <div class="feature-icon"><i class="ti ti-cloud-rain" aria-hidden="true"></i></div>
+      <div class="feature-title">Auto-fetch cuaca</div>
+      <div class="feature-desc">Data ramalan terbaru diambil otomatis setiap 6 jam dari OpenWeatherMap.</div>
+    </div>
+    <div class="feature-cell">
+      <div class="feature-icon"><i class="ti ti-chart-bar" aria-hidden="true"></i></div>
+      <div class="feature-title">Analisis risiko</div>
+      <div class="feature-desc">Kalkulasi risiko hujan, angin, dan suhu panas secara otomatis per event.</div>
+    </div>
+    <div class="feature-cell">
+      <div class="feature-icon"><i class="ti ti-bell" aria-hidden="true"></i></div>
+      <div class="feature-title">Notifikasi real-time</div>
+      <div class="feature-desc">Peringatan langsung saat status cuaca berubah menjadi risiko tinggi.</div>
+    </div>
+    <div class="feature-cell">
+      <div class="feature-icon"><i class="ti ti-calendar" aria-hidden="true"></i></div>
+      <div class="feature-title">Multi-event</div>
+      <div class="feature-desc">Kelola banyak acara sekaligus dalam satu dashboard terpusat.</div>
+    </div>
+    <div class="feature-cell">
+      <div class="feature-icon"><i class="ti ti-history" aria-hidden="true"></i></div>
+      <div class="feature-title">Histori cuaca</div>
+      <div class="feature-desc">Lihat tren perubahan risiko dari waktu ke waktu untuk setiap acara.</div>
+    </div>
+    <div class="feature-cell">
+      <div class="feature-icon"><i class="ti ti-bulb" aria-hidden="true"></i></div>
+      <div class="feature-title">Rekomendasi</div>
+      <div class="feature-desc">Saran tindakan konkret berdasarkan kondisi cuaca yang diperkirakan.</div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="background: var(--color-background-secondary);">
+  <p class="section-label">Contoh Output</p>
+  <h2 class="section-title">Analisis risiko yang jelas dan dapat ditindaklanjuti</h2>
+  <p class="section-sub">Sistem mengambil worst-case dari setiap interval cuaca dalam rentang waktu event.</p>
+  <div class="risk-demo">
+    <div class="risk-demo-title">Festival UMKM Kendari · 14 Jul 2026 · 13:00–17:00</div>
+    <div class="risk-row">
+      <span class="risk-label">Risiko hujan</span>
+      <div class="risk-bar-wrap"><div class="risk-bar" style="width: 82%; background: #E24B4A;"></div></div>
+      <span class="risk-badge badge-high">HIGH</span>
+    </div>
+    <div class="risk-row">
+      <span class="risk-label">Risiko angin</span>
+      <div class="risk-bar-wrap"><div class="risk-bar" style="width: 35%; background: #EF9F27;"></div></div>
+      <span class="risk-badge badge-med">MED</span>
+    </div>
+    <div class="risk-row">
+      <span class="risk-label">Risiko suhu</span>
+      <div class="risk-bar-wrap"><div class="risk-bar" style="width: 18%; background: #639922;"></div></div>
+      <span class="risk-badge badge-low">LOW</span>
+    </div>
+    <div class="overall-row">
+      <span class="overall-label">Overall risk</span>
+      <span class="risk-badge badge-high" style="font-size: 13px; padding: 5px 14px;">HIGH</span>
+    </div>
+    <div style="margin-top: 14px; padding: 12px; background: #FCEBEB; border-radius: var(--border-radius-md); font-size: 12px; color: #A32D2D; line-height: 1.5;">
+      <i class="ti ti-alert-circle" style="font-size: 14px; vertical-align: -2px; margin-right: 4px;" aria-hidden="true"></i>
+      Disarankan menyediakan tenda atau memindahkan acara ke lokasi indoor. Risiko hujan tinggi diperkirakan sekitar jam 15:00.
+    </div>
+  </div>
+</div>
+
+<div class="section" style="background: var(--color-background-primary);">
+  <p class="section-label">Harga</p>
+  <h2 class="section-title">Pilih paket yang sesuai</h2>
+  <p class="section-sub">Mulai gratis, upgrade kapan saja.</p>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pricing-tier">Free</div>
+      <div class="pricing-price">Rp 0</div>
+      <div class="pricing-price-sub">Selamanya gratis</div>
+      <div class="pricing-divider"></div>
+      <div class="pricing-feature"><i class="ti ti-check" aria-hidden="true"></i>Maksimal 3 acara</div>
+      <div class="pricing-feature"><i class="ti ti-check" aria-hidden="true"></i>Data cuaca dasar</div>
+      <div class="pricing-feature"><i class="ti ti-check" aria-hidden="true"></i>Analisis risiko standar</div>
+      <button class="pricing-cta">Mulai gratis</button>
+    </div>
+    <div class="pricing-card featured">
+      <span class="pricing-badge">Paling populer</span>
+      <div class="pricing-tier">Pro</div>
+      <div class="pricing-price">Rp 99k</div>
+      <div class="pricing-price-sub">per bulan</div>
+      <div class="pricing-divider"></div>
+      <div class="pricing-feature"><i class="ti ti-check" aria-hidden="true"></i>50 acara aktif</div>
+      <div class="pricing-feature"><i class="ti ti-check" aria-hidden="true"></i>Histori cuaca lengkap</div>
+      <div class="pricing-feature"><i class="ti ti-check" aria-hidden="true"></i>Notifikasi prioritas</div>
+      <div class="pricing-feature"><i class="ti ti-check" aria-hidden="true"></i>Analisis risiko lanjutan</div>
+      <button class="pricing-cta primary">Langganan Pro</button>
+    </div>
+    <div class="pricing-card">
+      <div class="pricing-tier">Enterprise</div>
+      <div class="pricing-price">Custom</div>
+      <div class="pricing-price-sub">Hubungi sales</div>
+      <div class="pricing-divider"></div>
+      <div class="pricing-feature"><i class="ti ti-check" aria-hidden="true"></i>Acara tak terbatas</div>
+      <div class="pricing-feature"><i class="ti ti-check" aria-hidden="true"></i>Dedicated server</div>
+      <div class="pricing-feature"><i class="ti ti-check" aria-hidden="true"></i>Akses API kustom</div>
+      <div class="pricing-feature"><i class="ti ti-check" aria-hidden="true"></i>SLA dukungan 24/7</div>
+      <button class="pricing-cta">Hubungi sales</button>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="background: var(--color-background-secondary);">
+  <p class="section-label">Kontak</p>
+  <h2 class="section-title">Ada pertanyaan?</h2>
+  <p class="section-sub">Tim kami siap membantu Anda.</p>
+  <div class="contact-card">
+    <div class="field-label">Nama</div>
+    <input class="field-input" type="text" placeholder="Nama lengkap">
+    <div class="field-label">Email</div>
+    <input class="field-input" type="email" placeholder="email@contoh.com">
+    <div class="field-label">Pesan</div>
+    <textarea class="field-textarea" placeholder="Tulis pesan Anda..."></textarea>
+    <button class="eg-btn-primary" style="width: 100%; padding: 10px; font-size: 14px;">Kirim pesan</button>
+  </div>
+</div>
+
+<div class="eg-footer">© 2026 EventGuard. All rights reserved.</div>

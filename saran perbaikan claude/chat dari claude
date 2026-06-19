@@ -1,0 +1,52 @@
+Ini preview `base.html` yang sudah dipecah jadi komponen-komponen yang bisa dilihat sekaligus.
+
+**Perubahan dari versi lama:**
+
+Navbar sekarang punya **dua varian** yang dipisah lewat Jinja2 block — navbar publik (untuk landing/login/register, berisi link Fitur/Harga/Kontak + tombol Masuk/Daftar) dan navbar dashboard (untuk halaman setelah login, berisi navigasi Dashboard/Acara Saya/Histori Cuaca + ikon lonceng notifikasi + avatar inisial user). Brand logo sekarang punya ikon kotak biru kecil di sebelah teks supaya lebih berkarakter.
+
+Toast system didesain ulang — sebelumnya pakai background hijau/merah solid (kurang premium), sekarang pakai background putih dengan border berwarna tipis dan teks berwarna sesuai semantik (success hijau, error merah, info biru). Jauh lebih minimalis.
+
+Footer juga lebih berimbang — brand di kiri, copyright di tengah, link utilitas (Privasi/Syarat/Kontak) di kanan.
+
+**Untuk Antigravity:** di `base.html`, gunakan `{% block navbar_type %}` atau kondisional `{% if current_user %}` untuk switch antara dua varian navbar. Toast function `showToast()` tetap di base, tapi stylenya mengikuti desain baru ini.
+
+Lanjut ke `login.html` dan `register.html` sekaligus, atau satu per satu?
+
+
+
+
+Ini preview `login.html` dan `register.html` sekaligus.
+
+**Yang berubah dan ditambahkan dari versi lama:**
+
+Login sekarang punya ikon di setiap field (amplop untuk email, gembok untuk password), tombol show/hide password di kanan field, checkbox "Ingat saya" + link "Lupa password?" dalam satu baris, dan error banner di atas form (bukan hanya teks merah kecil di bawah tombol seperti sebelumnya).
+
+Register punya beberapa penambahan signifikan — nama depan dan belakang dipisah jadi dua kolom berdampingan, ada **step indicator** (1. Info akun → 2. Verifikasi) yang memberi kesan onboarding yang terstruktur, **password strength bar** yang berubah warna dari merah/kuning/hijau sesuai kekuatan password, field error state inline (border merah + pesan di bawah field, bukan hanya error banner global), dan checkbox persetujuan Syarat Layanan. Tombol register pakai warna hijau untuk membedakan secara visual dari login yang biru.
+
+**Catatan untuk Antigravity:** nama depan dan belakang di form register sebaiknya tetap dikirim sebagai satu field `name` ke backend (gabungkan dengan JS sebelum `fetch`), supaya skema database tidak perlu diubah. Password strength bar cukup dihitung client-side dari panjang dan variasi karakter, tidak perlu endpoint backend.
+
+Lanjut ke `dashboard.html`?
+
+
+
+
+
+Dashboard-nya sudah lengkap dengan semua komponen utama.
+
+**Yang ada di desain ini:**
+
+Stat cards 4 kolom di atas — total acara, acara mendatang, risiko tinggi, acara selesai — masing-masing punya ikon berwarna sesuai semantik dan angka tren kecil di pojok kanan. Tabel event di bawahnya punya 4 status berbeda sekaligus: HIGH (merah), MED (kuning), LOW (hijau), dan "Menunggu" (abu) untuk event yang masih jauh (status `TOO_FAR` dari diskusi sebelumnya). Line chart tren risiko pakai Chart.js — menampilkan tren hujan dan angin 7 hari terakhir, ini yang akan di-populate dari data `risk_analysis` historis di database.
+
+Sidebar kanan punya dua panel: notifikasi dengan dot berwarna sesuai severity (merah untuk HIGH alert, kuning untuk info baru, abu untuk sudah dibaca), dan widget cuaca terkini yang menampilkan 4 metrik utama dari `weather_logs`.
+
+Di bagian bawah ada **modal tambah acara** — ini yang muncul saat klik tombol "Tambah acara" di header. Field-nya persis sesuai skema tabel `events`: nama, lokasi, tanggal, jam mulai, jam selesai.
+
+**Catatan untuk Antigravity:** chart tren dipanggil lewat `GET /api/events/{id}/weather/history` dan di-render client-side dengan Chart.js. Data cuaca terkini di sidebar diambil dari `GET /api/dashboard/summary` yang sudah menyertakan snapshot cuaca acara paling dekat. Modal tidak pakai `<form>`, gunakan event listener JS dan `fetch` ke `POST /api/events` sesuai arsitektur yang sudah kita rancang.
+
+Semua 5 halaman sudah selesai — landing, base, login, register, dashboard. Mau saya rangkum semua perubahan desain dalam satu catatan ringkas untuk di-paste ke Antigravity?
+
+
+
+
+
+

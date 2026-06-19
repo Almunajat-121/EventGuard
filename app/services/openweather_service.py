@@ -31,9 +31,13 @@ async def fetch_weather_data(lat: float, lon: float):
     else:
         # Panggil API asli OpenWeatherMap (5 Day / 3 Hour Forecast)
         url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={settings.openweather_api_key}&units=metric"
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(url)
-            if response.status_code != 200:
+            if response.status_code == 401:
+                raise ValueError("API Key OpenWeatherMap tidak valid (401).")
+            elif response.status_code == 429:
+                raise ValueError("Rate limit tercapai (429). Silakan coba beberapa saat lagi.")
+            elif response.status_code != 200:
                 raise ValueError(f"Gagal memanggil API OpenWeatherMap: {response.text}")
             return response.json()
 
@@ -42,9 +46,13 @@ async def geocode_location(location_name: str):
         return {"lat": -6.2088, "lon": 106.8456} # Default to Jakarta for mock
         
     url = f"http://api.openweathermap.org/geo/1.0/direct?q={location_name}&limit=1&appid={settings.openweather_api_key}"
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.get(url)
-        if response.status_code != 200:
+        if response.status_code == 401:
+            raise ValueError("API Key OpenWeatherMap tidak valid (401).")
+        elif response.status_code == 429:
+            raise ValueError("Rate limit tercapai (429). Silakan coba beberapa saat lagi.")
+        elif response.status_code != 200:
             raise ValueError(f"Gagal memanggil Geocoding API: {response.text}")
         data = response.json()
         if not data:

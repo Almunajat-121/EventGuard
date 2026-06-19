@@ -5,11 +5,11 @@ from app.database import get_db
 from app.models.event import Event
 from app.models.user import User
 from app.core.deps import get_current_user_from_cookie
-from app.services.weather_updater import update_event_weather
+from app.services.weather_updater import update_event_weather, reanalyze_event_risk
 
-router = APIRouter(prefix="/api/events/{event_id}/weather", tags=["weather"])
+router = APIRouter(prefix="/api/events/{event_id}", tags=["weather", "risk"])
 
-@router.post("/refresh")
+@router.post("/weather/refresh")
 async def refresh_weather(
     event_id: str,
     db: AsyncSession = Depends(get_db),
@@ -31,7 +31,7 @@ async def refresh_weather(
         
     return {"message": "Weather refreshed and risk updated"}
 
-@router.get("", response_model=dict)
+@router.get("/weather", response_model=dict)
 async def get_latest_weather(
     event_id: str,
     db: AsyncSession = Depends(get_db),
@@ -63,7 +63,7 @@ async def get_latest_weather(
         "fetched_at": str(weather.fetched_at)
     }
 
-@router.get("/history", response_model=list[dict])
+@router.get("/weather/history", response_model=list[dict])
 async def get_weather_history(
     event_id: str,
     db: AsyncSession = Depends(get_db),
@@ -119,5 +119,12 @@ async def manual_risk_analyze(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user_from_cookie)
 ):
-    # For now, map to refresh
-    return await refresh_weather(event_id, db, current_user)
+    result = await db.execute(select(Event).where(Event.id == event_id, Event.user_id == current_user.id))
+    if not result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Event not found")
+        
+    success = await reanalyze_event_risk(event_id, db)
+    if not success:
+        raise HTTPException(status_code=400, detail="Failed to reanalyze risk. Make sure weather data exists.")
+        
+    return {"message": "Risk reanalyzed successfully"}

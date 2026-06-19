@@ -9,7 +9,11 @@ class Settings(BaseSettings):
     openweather_mode: str = "mock"
     jwt_secret: str = "supersecretjwtkeythatshouldbechanged"
     
-    model_config = SettingsConfigDict(env_file=".env.development", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=[".env.development", ".env.production"],
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
 
 @lru_cache()
 def get_settings() -> Settings:

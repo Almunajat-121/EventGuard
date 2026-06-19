@@ -40,9 +40,27 @@ async def get_dashboard_summary(
     )
     high_risk_events = result_high_risk.scalar() or 0
     
+    result_medium = await db.execute(
+        select(func.count(func.distinct(Event.id)))
+        .join(RiskAnalysis, Event.id == RiskAnalysis.event_id)
+        .where(Event.user_id == current_user.id)
+        .where(RiskAnalysis.overall_risk == "MEDIUM")
+    )
+    medium_risk_events = result_medium.scalar() or 0
+
+    result_low = await db.execute(
+        select(func.count(func.distinct(Event.id)))
+        .join(RiskAnalysis, Event.id == RiskAnalysis.event_id)
+        .where(Event.user_id == current_user.id)
+        .where(RiskAnalysis.overall_risk == "LOW")
+    )
+    low_risk_events = result_low.scalar() or 0
+    
     return {
         "total_events": total_events,
         "upcoming_events": upcoming_events,
         "high_risk_events": high_risk_events,
+        "medium_risk_events": medium_risk_events,
+        "low_risk_events": low_risk_events,
         "subscription": current_user.subscription_tier
     }

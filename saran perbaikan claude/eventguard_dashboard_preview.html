@@ -1,0 +1,397 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.eg-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 1.25rem; height: 52px;
+  background: var(--color-background-primary);
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+}
+.eg-brand { display: flex; align-items: center; gap: 20px; }
+.eg-brand-logo { display: flex; align-items: center; gap: 7px; font-size: 15px; font-weight: 500; color: #185FA5; }
+.eg-brand-icon { width: 24px; height: 24px; border-radius: 6px; background: #185FA5; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.eg-nav-links { display: flex; gap: 2px; }
+.eg-nl { font-size: 13px; color: var(--color-text-secondary); padding: 5px 9px; border-radius: var(--border-radius-md); cursor: pointer; text-decoration: none; }
+.eg-nl.active { color: var(--color-text-primary); background: var(--color-background-secondary); font-weight: 500; }
+.eg-nav-right { display: flex; align-items: center; gap: 8px; }
+.eg-notif { position: relative; width: 32px; height: 32px; border-radius: var(--border-radius-md); background: transparent; border: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--color-text-secondary); font-size: 15px; }
+.eg-notif-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; background: #E24B4A; border-radius: 50%; border: 1.5px solid var(--color-background-primary); }
+.eg-avatar { width: 28px; height: 28px; border-radius: 50%; background: #E6F1FB; color: #185FA5; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; border: 0.5px solid #B5D4F4; cursor: pointer; }
+
+.dash-body { background: var(--color-background-secondary); padding: 20px 1.25rem; }
+
+.dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+.dash-greeting { font-size: 18px; font-weight: 500; color: var(--color-text-primary); letter-spacing: -0.2px; }
+.dash-sub { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+.btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #185FA5; color: #fff; font-size: 13px; font-weight: 500; border-radius: var(--border-radius-md); border: none; cursor: pointer; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+.stat-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px 16px; }
+.stat-icon-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.stat-icon { width: 30px; height: 30px; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.stat-trend { font-size: 11px; font-weight: 500; display: flex; align-items: center; gap: 3px; }
+.stat-num { font-size: 22px; font-weight: 500; color: var(--color-text-primary); letter-spacing: -0.5px; }
+.stat-label { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+
+.dash-grid { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 14px; }
+
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); }
+.card-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.card-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.card-action { font-size: 12px; color: #185FA5; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+
+.event-list { padding: 8px 0; }
+.event-row { display: grid; grid-template-columns: minmax(0,1fr) 90px 80px 70px; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.event-row:last-child { border-bottom: none; }
+.event-row-head { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; }
+.event-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.event-loc { font-size: 11px; color: var(--color-text-tertiary); margin-top: 1px; display: flex; align-items: center; gap: 3px; }
+.event-date { font-size: 12px; color: var(--color-text-secondary); }
+.risk-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 99px; font-size: 11px; font-weight: 500; }
+.risk-high { background: #FCEBEB; color: #A32D2D; }
+.risk-med { background: #FAEEDA; color: #854F0B; }
+.risk-low { background: #EAF3DE; color: #3B6D11; }
+.risk-pending { background: var(--color-background-secondary); color: var(--color-text-tertiary); }
+.event-menu { color: var(--color-text-tertiary); font-size: 15px; cursor: pointer; justify-self: end; }
+
+.forecast-badge { font-size: 11px; color: var(--color-text-tertiary); }
+
+.sidebar { display: flex; flex-direction: column; gap: 14px; }
+
+.notif-list { padding: 8px 0; }
+.notif-item { display: flex; gap: 10px; padding: 10px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.notif-item:last-child { border-bottom: none; }
+.notif-dot-wrap { padding-top: 3px; }
+.notif-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.notif-text { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+.notif-time { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+.notif-unread { background: var(--color-background-secondary); }
+
+.weather-snap { padding: 14px; }
+.ws-location { font-size: 12px; color: var(--color-text-tertiary); display: flex; align-items: center; gap: 4px; margin-bottom: 12px; }
+.ws-temp { font-size: 28px; font-weight: 500; color: var(--color-text-primary); letter-spacing: -0.5px; }
+.ws-cond { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; margin-bottom: 14px; }
+.ws-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ws-item { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 8px 10px; }
+.ws-item-label { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 3px; }
+.ws-item-val { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+
+.empty-state { padding: 32px 16px; text-align: center; }
+.empty-icon { font-size: 28px; color: var(--color-text-tertiary); margin-bottom: 8px; }
+.empty-text { font-size: 13px; color: var(--color-text-secondary); }
+
+.chart-wrap { padding: 14px 16px; position: relative; height: 140px; }
+
+.modal-overlay { background: rgba(0,0,0,0.35); min-height: 320px; display: flex; align-items: center; justify-content: center; margin-top: 20px; border-radius: var(--border-radius-lg); }
+.modal { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 24px; width: 340px; }
+.modal-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+.modal-sub { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 18px; }
+.modal-field { margin-bottom: 12px; }
+.modal-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 5px; }
+.modal-input { width: 100%; padding: 8px 10px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); }
+.modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+.btn-cancel { flex: 1; padding: 8px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; color: var(--color-text-secondary); font-size: 13px; cursor: pointer; }
+.btn-confirm { flex: 1; padding: 8px; background: #185FA5; color: #fff; border: none; border-radius: var(--border-radius-md); font-size: 13px; font-weight: 500; cursor: pointer; }
+</style>
+
+<h2 class="sr-only">Preview halaman dashboard EventGuard — stat cards, daftar event dengan risk level, notifikasi, cuaca terkini, dan modal tambah event</h2>
+
+<nav class="eg-nav">
+  <div class="eg-brand">
+    <div class="eg-brand-logo">
+      <div class="eg-brand-icon"><i class="ti ti-shield-check" aria-hidden="true"></i></div>
+      EventGuard
+    </div>
+    <div class="eg-nav-links">
+      <a class="eg-nl active" href="#">Dashboard</a>
+      <a class="eg-nl" href="#">Acara saya</a>
+      <a class="eg-nl" href="#">Histori cuaca</a>
+    </div>
+  </div>
+  <div class="eg-nav-right">
+    <button class="eg-notif" aria-label="Notifikasi">
+      <i class="ti ti-bell" aria-hidden="true"></i>
+      <span class="eg-notif-dot"></span>
+    </button>
+    <div class="eg-avatar">BS</div>
+  </div>
+</nav>
+
+<div class="dash-body">
+
+  <div class="dash-header">
+    <div>
+      <div class="dash-greeting">Selamat siang, Budi</div>
+      <div class="dash-sub">Kamis, 19 Juni 2026 · 3 acara mendatang</div>
+    </div>
+    <button class="btn-primary">
+      <i class="ti ti-plus" aria-hidden="true"></i>
+      Tambah acara
+    </button>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-icon-row">
+        <div class="stat-icon" style="background:#E6F1FB;color:#185FA5;"><i class="ti ti-calendar-event" aria-hidden="true"></i></div>
+        <span class="stat-trend" style="color:#3B6D11;"><i class="ti ti-arrow-up" style="font-size:10px" aria-hidden="true"></i>2</span>
+      </div>
+      <div class="stat-num">7</div>
+      <div class="stat-label">Total acara</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-row">
+        <div class="stat-icon" style="background:#EAF3DE;color:#3B6D11;"><i class="ti ti-clock" aria-hidden="true"></i></div>
+        <span class="stat-trend" style="color:#3B6D11;"><i class="ti ti-arrow-up" style="font-size:10px" aria-hidden="true"></i>1</span>
+      </div>
+      <div class="stat-num">3</div>
+      <div class="stat-label">Acara mendatang</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-row">
+        <div class="stat-icon" style="background:#FCEBEB;color:#A32D2D;"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div>
+        <span class="stat-trend" style="color:#A32D2D;"><i class="ti ti-arrow-up" style="font-size:10px" aria-hidden="true"></i>1</span>
+      </div>
+      <div class="stat-num">2</div>
+      <div class="stat-label">Risiko tinggi</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-row">
+        <div class="stat-icon" style="background:#F1EFE8;color:#5F5E5A;"><i class="ti ti-circle-check" aria-hidden="true"></i></div>
+        <span class="stat-trend" style="color:#5F5E5A;">—</span>
+      </div>
+      <div class="stat-num">4</div>
+      <div class="stat-label">Acara selesai</div>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Acara mendatang</span>
+          <a href="#" class="card-action">Lihat semua <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i></a>
+        </div>
+        <div class="event-list">
+          <div class="event-row event-row-head">
+            <span>Nama acara</span>
+            <span>Tanggal</span>
+            <span>Risiko</span>
+            <span></span>
+          </div>
+          <div class="event-row">
+            <div>
+              <div class="event-name">Festival UMKM Kendari</div>
+              <div class="event-loc"><i class="ti ti-map-pin" style="font-size:10px" aria-hidden="true"></i>Kendari, Sultra</div>
+            </div>
+            <div class="event-date">14 Jul 2026</div>
+            <span class="risk-pill risk-high"><i class="ti ti-alert-circle" style="font-size:10px" aria-hidden="true"></i>HIGH</span>
+            <i class="ti ti-dots-vertical event-menu" aria-hidden="true"></i>
+          </div>
+          <div class="event-row">
+            <div>
+              <div class="event-name">Wedding Andi & Sari</div>
+              <div class="event-loc"><i class="ti ti-map-pin" style="font-size:10px" aria-hidden="true"></i>Makassar, Sulsel</div>
+            </div>
+            <div class="event-date">22 Jul 2026</div>
+            <span class="risk-pill risk-med"><i class="ti ti-minus" style="font-size:10px" aria-hidden="true"></i>MED</span>
+            <i class="ti ti-dots-vertical event-menu" aria-hidden="true"></i>
+          </div>
+          <div class="event-row">
+            <div>
+              <div class="event-name">Lomba Lari 10K UHO</div>
+              <div class="event-loc"><i class="ti ti-map-pin" style="font-size:10px" aria-hidden="true"></i>Kendari, Sultra</div>
+            </div>
+            <div class="event-date">5 Agt 2026</div>
+            <span class="risk-pill risk-low"><i class="ti ti-check" style="font-size:10px" aria-hidden="true"></i>LOW</span>
+            <i class="ti ti-dots-vertical event-menu" aria-hidden="true"></i>
+          </div>
+          <div class="event-row">
+            <div>
+              <div class="event-name">Konser Kampus</div>
+              <div class="event-loc"><i class="ti ti-map-pin" style="font-size:10px" aria-hidden="true"></i>Kendari, Sultra</div>
+            </div>
+            <div class="event-date">12 Sep 2026</div>
+            <span class="risk-pill risk-pending"><i class="ti ti-clock" style="font-size:10px" aria-hidden="true"></i>Menunggu</span>
+            <i class="ti ti-dots-vertical event-menu" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Tren risiko — Festival UMKM Kendari</span>
+          <span class="forecast-badge">7 hari terakhir</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="riskChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="sidebar">
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Notifikasi</span>
+          <a href="#" class="card-action">Tandai semua</a>
+        </div>
+        <div class="notif-list">
+          <div class="notif-item notif-unread">
+            <div class="notif-dot-wrap"><div class="notif-dot" style="background:#E24B4A;"></div></div>
+            <div>
+              <div class="notif-text">Risiko naik ke <strong>HIGH</strong> untuk Festival UMKM Kendari.</div>
+              <div class="notif-time">2 jam lalu</div>
+            </div>
+          </div>
+          <div class="notif-item notif-unread">
+            <div class="notif-dot-wrap"><div class="notif-dot" style="background:#EF9F27;"></div></div>
+            <div>
+              <div class="notif-text">Prakiraan tersedia untuk Wedding Andi & Sari.</div>
+              <div class="notif-time">6 jam lalu</div>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-dot-wrap"><div class="notif-dot" style="background:var(--color-border-secondary);"></div></div>
+            <div>
+              <div class="notif-text">Data cuaca diperbarui untuk 3 acara.</div>
+              <div class="notif-time">12 jam lalu</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Cuaca terkini</span>
+          <span class="forecast-badge">Kendari</span>
+        </div>
+        <div class="weather-snap">
+          <div class="ws-location"><i class="ti ti-map-pin" style="font-size:12px" aria-hidden="true"></i>Kendari, Sultra</div>
+          <div class="ws-temp">29°C</div>
+          <div class="ws-cond">Berawan sebagian · Terasa 32°C</div>
+          <div class="ws-grid">
+            <div class="ws-item">
+              <div class="ws-item-label">Kelembaban</div>
+              <div class="ws-item-val">78%</div>
+            </div>
+            <div class="ws-item">
+              <div class="ws-item-label">Angin</div>
+              <div class="ws-item-val">6.2 m/s</div>
+            </div>
+            <div class="ws-item">
+              <div class="ws-item-label">Awan</div>
+              <div class="ws-item-val">65%</div>
+            </div>
+            <div class="ws-item">
+              <div class="ws-item-label">Hujan</div>
+              <div class="ws-item-val">45%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">Tambah acara baru</div>
+    <div class="modal-sub">Sistem akan otomatis memantau cuaca setelah acara dibuat.</div>
+    <div class="modal-field">
+      <div class="modal-label">Nama acara</div>
+      <input class="modal-input" type="text" placeholder="cth: Festival Musik Kendari 2026">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Lokasi</div>
+      <input class="modal-input" type="text" placeholder="cth: Kendari, Sulawesi Tenggara">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Tanggal acara</div>
+      <input class="modal-input" type="date" value="2026-07-14">
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <div class="modal-label">Jam mulai</div>
+        <input class="modal-input" type="time" value="13:00">
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Jam selesai</div>
+        <input class="modal-input" type="time" value="17:00">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel">Batal</button>
+      <button class="btn-confirm">Buat acara</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const ctx = document.getElementById('riskChart');
+if (ctx) {
+  const labels = ['13 Jun','14 Jun','15 Jun','16 Jun','17 Jun','18 Jun','19 Jun'];
+  const rain = [30, 45, 60, 55, 70, 80, 82];
+  const wind = [10, 15, 20, 25, 30, 35, 35];
+  const style = getComputedStyle(document.documentElement);
+  const textColor = style.getPropertyValue('--color-text-tertiary') || '#9ca3af';
+  const borderColor = style.getPropertyValue('--color-border-tertiary') || '#e5e7eb';
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Risiko hujan (%)',
+          data: rain,
+          borderColor: '#E24B4A',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 3,
+          pointBackgroundColor: '#E24B4A',
+          tension: 0.4
+        },
+        {
+          label: 'Risiko angin (%)',
+          data: wind,
+          borderColor: '#EF9F27',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 3,
+          pointBackgroundColor: '#EF9F27',
+          tension: 0.4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { font: { size: 11 }, color: textColor, boxWidth: 12, padding: 12 }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: borderColor, lineWidth: 0.5 },
+          ticks: { font: { size: 11 }, color: textColor }
+        },
+        y: {
+          min: 0, max: 100,
+          grid: { color: borderColor, lineWidth: 0.5 },
+          ticks: { font: { size: 11 }, color: textColor, callback: v => v + '%' }
+        }
+      }
+    }
+  });
+}
+</script>

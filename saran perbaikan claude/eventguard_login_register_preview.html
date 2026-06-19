@@ -1,0 +1,381 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .preview-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 10px 0 6px;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    margin-bottom: 0;
+  }
+
+  /* shared nav strip */
+  .mini-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+    height: 52px;
+    background: var(--color-background-primary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+  .mini-brand {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 15px; font-weight: 500; color: #185FA5;
+  }
+  .mini-brand-icon {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: #185FA5; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .mini-nav-hint { font-size: 12px; color: var(--color-text-tertiary); }
+  .mini-nav-hint a { color: #185FA5; text-decoration: none; font-weight: 500; }
+
+  /* page bg */
+  .auth-page {
+    background: var(--color-background-secondary);
+    padding: 40px 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* card */
+  .auth-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 32px 28px;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  /* header */
+  .auth-icon-wrap {
+    width: 40px; height: 40px;
+    border-radius: var(--border-radius-md);
+    background: #E6F1FB;
+    display: flex; align-items: center; justify-content: center;
+    color: #185FA5; font-size: 20px;
+    margin-bottom: 16px;
+  }
+  .auth-title {
+    font-size: 18px; font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+  }
+  .auth-sub {
+    font-size: 13px; color: var(--color-text-secondary);
+    margin-bottom: 24px; line-height: 1.5;
+  }
+
+  /* divider */
+  .auth-divider {
+    height: 0.5px;
+    background: var(--color-border-tertiary);
+    margin: 20px 0;
+  }
+
+  /* field */
+  .field-group { margin-bottom: 14px; }
+  .field-label {
+    font-size: 12px; font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px; display: block;
+  }
+  .field-input-wrap { position: relative; }
+  .field-input {
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 13px;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    outline: none;
+  }
+  .field-input:focus {
+    border-color: #185FA5;
+    box-shadow: 0 0 0 3px #E6F1FB;
+  }
+  .field-input.has-icon { padding-left: 36px; }
+  .field-icon {
+    position: absolute;
+    left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--color-text-tertiary);
+    font-size: 15px; pointer-events: none;
+  }
+  .field-eye {
+    position: absolute;
+    right: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--color-text-tertiary);
+    font-size: 15px; cursor: pointer;
+  }
+  .field-hint {
+    font-size: 11px; color: var(--color-text-tertiary);
+    margin-top: 4px;
+  }
+
+  /* error state */
+  .field-input.error { border-color: var(--color-border-danger); }
+  .field-error {
+    font-size: 11px; color: var(--color-text-danger);
+    margin-top: 4px; display: flex; align-items: center; gap: 4px;
+  }
+
+  /* error banner */
+  .auth-error-banner {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px;
+    background: #FCEBEB;
+    border: 0.5px solid var(--color-border-danger);
+    border-radius: var(--border-radius-md);
+    font-size: 13px; color: #A32D2D;
+    margin-bottom: 16px;
+  }
+
+  /* password strength */
+  .strength-wrap { margin-top: 6px; display: flex; gap: 4px; }
+  .strength-bar {
+    flex: 1; height: 3px; border-radius: 99px;
+    background: var(--color-border-tertiary);
+  }
+  .strength-bar.filled-weak { background: #E24B4A; }
+  .strength-bar.filled-med { background: #EF9F27; }
+  .strength-bar.filled-strong { background: #639922; }
+  .strength-label {
+    font-size: 11px; color: var(--color-text-tertiary);
+    margin-top: 4px;
+  }
+
+  /* checkbox */
+  .check-row {
+    display: flex; align-items: flex-start; gap: 8px;
+    margin-bottom: 18px;
+  }
+  .check-box {
+    width: 15px; height: 15px; border-radius: 4px;
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-primary);
+    flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .check-label { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  .check-label a { color: #185FA5; text-decoration: none; }
+
+  /* remember + forgot row */
+  .auth-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 18px;
+  }
+  .auth-remember { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-secondary); }
+  .auth-forgot { font-size: 12px; color: #185FA5; text-decoration: none; }
+
+  /* submit */
+  .auth-submit {
+    width: 100%; padding: 10px;
+    background: #185FA5; color: #fff;
+    font-size: 14px; font-weight: 500;
+    border: none; border-radius: var(--border-radius-md);
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .auth-submit:hover { background: #0C447C; }
+
+  /* footer link */
+  .auth-footer-link {
+    text-align: center; margin-top: 16px;
+    font-size: 13px; color: var(--color-text-secondary);
+  }
+  .auth-footer-link a { color: #185FA5; text-decoration: none; font-weight: 500; }
+
+  /* OR divider */
+  .or-divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 18px 0;
+  }
+  .or-line { flex: 1; height: 0.5px; background: var(--color-border-tertiary); }
+  .or-text { font-size: 11px; color: var(--color-text-tertiary); }
+
+  /* name row */
+  .name-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* step indicator (register) */
+  .step-bar { display: flex; align-items: center; gap: 0; margin-bottom: 22px; }
+  .step-item { display: flex; align-items: center; gap: 0; flex: 1; }
+  .step-dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #E6F1FB; color: #185FA5;
+    font-size: 11px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; border: 0.5px solid #B5D4F4;
+  }
+  .step-dot.active { background: #185FA5; color: #fff; border-color: #185FA5; }
+  .step-dot.done { background: #185FA5; color: #fff; border-color: #185FA5; }
+  .step-label { font-size: 11px; color: var(--color-text-tertiary); margin-left: 6px; white-space: nowrap; }
+  .step-label.active { color: #185FA5; font-weight: 500; }
+  .step-line { flex: 1; height: 0.5px; background: var(--color-border-tertiary); margin: 0 6px; }
+  .step-line.done { background: #185FA5; }
+
+  .spacer { height: 32px; }
+</style>
+
+<h2 class="sr-only">Preview halaman login dan register EventGuard dengan desain minimalis premium</h2>
+
+<div class="preview-label">Login</div>
+
+<div class="mini-nav">
+  <div class="mini-brand">
+    <div class="mini-brand-icon"><i class="ti ti-shield-check" aria-hidden="true"></i></div>
+    EventGuard
+  </div>
+  <span class="mini-nav-hint">Belum punya akun? <a href="#">Daftar gratis</a></span>
+</div>
+
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-icon-wrap">
+      <i class="ti ti-login" aria-hidden="true"></i>
+    </div>
+    <div class="auth-title">Masuk ke akun Anda</div>
+    <div class="auth-sub">Pantau risiko cuaca acara outdoor Anda.</div>
+
+    <div class="auth-error-banner" style="display:none">
+      <i class="ti ti-alert-circle" style="font-size:15px;flex-shrink:0" aria-hidden="true"></i>
+      Email atau password salah. Silakan coba lagi.
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Email</label>
+      <div class="field-input-wrap">
+        <i class="ti ti-mail field-icon" aria-hidden="true"></i>
+        <input class="field-input has-icon" type="email" placeholder="email@contoh.com" value="budi@eventco.id">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Password</label>
+      <div class="field-input-wrap">
+        <i class="ti ti-lock field-icon" aria-hidden="true"></i>
+        <input class="field-input has-icon" type="password" placeholder="Password" value="••••••••" style="padding-right:36px">
+        <i class="ti ti-eye field-eye" aria-hidden="true"></i>
+      </div>
+    </div>
+
+    <div class="auth-meta">
+      <label class="auth-remember">
+        <div class="check-box" style="background:#185FA5;border-color:#185FA5;">
+          <i class="ti ti-check" style="font-size:10px;color:#fff" aria-hidden="true"></i>
+        </div>
+        Ingat saya
+      </label>
+      <a href="#" class="auth-forgot">Lupa password?</a>
+    </div>
+
+    <button class="auth-submit">
+      <i class="ti ti-login" aria-hidden="true"></i>
+      Masuk
+    </button>
+
+    <div class="auth-footer-link">
+      Belum punya akun? <a href="#">Daftar gratis</a>
+    </div>
+  </div>
+</div>
+
+<div class="spacer"></div>
+<div class="preview-label">Register</div>
+
+<div class="mini-nav">
+  <div class="mini-brand">
+    <div class="mini-brand-icon"><i class="ti ti-shield-check" aria-hidden="true"></i></div>
+    EventGuard
+  </div>
+  <span class="mini-nav-hint">Sudah punya akun? <a href="#">Masuk</a></span>
+</div>
+
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-icon-wrap" style="background:#EAF3DE;color:#3B6D11;">
+      <i class="ti ti-user-plus" aria-hidden="true"></i>
+    </div>
+    <div class="auth-title">Buat akun EventGuard</div>
+    <div class="auth-sub">Gratis selamanya untuk 3 acara pertama Anda.</div>
+
+    <div class="step-bar">
+      <div class="step-item">
+        <div class="step-dot active">1</div>
+        <span class="step-label active">Info akun</span>
+      </div>
+      <div class="step-line done"></div>
+      <div class="step-item">
+        <div class="step-dot">2</div>
+        <span class="step-label">Verifikasi</span>
+      </div>
+    </div>
+
+    <div class="name-row">
+      <div class="field-group">
+        <label class="field-label">Nama depan</label>
+        <div class="field-input-wrap">
+          <input class="field-input" type="text" placeholder="Budi" value="Budi">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Nama belakang</label>
+        <div class="field-input-wrap">
+          <input class="field-input" type="text" placeholder="Santoso" value="Santoso">
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Email</label>
+      <div class="field-input-wrap">
+        <i class="ti ti-mail field-icon" aria-hidden="true"></i>
+        <input class="field-input has-icon error" type="email" placeholder="email@contoh.com" value="budi@invalid">
+      </div>
+      <div class="field-error">
+        <i class="ti ti-alert-circle" style="font-size:12px" aria-hidden="true"></i>
+        Format email tidak valid.
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Password</label>
+      <div class="field-input-wrap">
+        <i class="ti ti-lock field-icon" aria-hidden="true"></i>
+        <input class="field-input has-icon" type="password" placeholder="Minimal 8 karakter" value="••••••••" style="padding-right:36px">
+        <i class="ti ti-eye field-eye" aria-hidden="true"></i>
+      </div>
+      <div class="strength-wrap">
+        <div class="strength-bar filled-strong"></div>
+        <div class="strength-bar filled-strong"></div>
+        <div class="strength-bar filled-strong"></div>
+        <div class="strength-bar"></div>
+      </div>
+      <div class="strength-label">Kekuatan: <span style="color:#3B6D11;font-weight:500;">Kuat</span></div>
+    </div>
+
+    <div class="check-row">
+      <div class="check-box" style="background:#185FA5;border-color:#185FA5;">
+        <i class="ti ti-check" style="font-size:10px;color:#fff" aria-hidden="true"></i>
+      </div>
+      <span class="check-label">Saya setuju dengan <a href="#">Syarat Layanan</a> dan <a href="#">Kebijakan Privasi</a> EventGuard.</span>
+    </div>
+
+    <button class="auth-submit" style="background:#1D9E75;">
+      <i class="ti ti-user-plus" aria-hidden="true"></i>
+      Buat akun gratis
+    </button>
+
+    <div class="auth-footer-link">
+      Sudah punya akun? <a href="#">Masuk di sini</a>
+    </div>
+  </div>
+</div>

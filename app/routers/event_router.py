@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 from datetime import datetime, date, timezone
 from app.database import get_db
 from app.models.event import Event
@@ -20,17 +20,17 @@ async def create_event(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user_from_cookie)
 ):
-    # Cek kuota event berdasarkan tier (Mock Logic)
+    # Cek kuota event berdasarkan tier
     if current_user.subscription_tier == "free":
-        result = await db.execute(select(Event).where(Event.user_id == current_user.id))
-        if len(result.scalars().all()) >= 3:
+        count_result = await db.execute(select(func.count(Event.id)).where(Event.user_id == current_user.id))
+        if count_result.scalar() >= 3:
             raise HTTPException(status_code=403, detail="Free tier limit reached (3 events). Please upgrade to Pro.")
 
     # Geocoding
     coords = await geocode_location(event_data.location)
-    lat, lon = None, None
-    if coords:
-        lat, lon = coords["lat"], coords["lon"]
+    if not coords:
+        raise HTTPException(status_code=400, detail=f"Location '{event_data.location}' could not be found.")
+    lat, lon = coords["lat"], coords["lon"]
 
     # Logika TOO_FAR vs AVAILABLE
     today = datetime.now(timezone.utc).date()

@@ -4,10 +4,19 @@ from app.routers import auth_router, event_router, weather_router, dashboard_rou
 
 settings = get_settings()
 
+from contextlib import asynccontextmanager
+from app.services.scheduler import start_scheduler
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+
 app = FastAPI(
     title="EventGuard",
     description="SaaS Weather Risk Monitoring for Outdoor Events",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 app.include_router(auth_router.router)

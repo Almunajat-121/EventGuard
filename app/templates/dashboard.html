@@ -3,13 +3,30 @@
 {% block title %}Dashboard - EventGuard{% endblock %}
 
 {% block nav_items %}
+    <!-- Notifications Dropdown -->
+    <div class="relative inline-block text-left mr-4">
+        <button id="notifDropdownBtn" class="relative text-gray-500 hover:text-gray-700 p-2 focus:outline-none">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <span id="notifBadge" class="hidden absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">0</span>
+        </button>
+        <div id="notifDropdown" class="hidden origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+            <div class="py-1">
+                <div class="px-4 py-2 border-b border-gray-100 text-sm font-semibold text-gray-700">Notifikasi</div>
+                <div id="notifList" class="max-h-60 overflow-y-auto">
+                    <!-- Notifications will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
     <a href="#" id="logoutBtn" class="text-gray-600 hover:text-red-600 px-3 py-2 rounded-md font-medium transition-colors">Logout</a>
 {% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
             <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">Total Events</h3>
             <p class="mt-2 text-3xl font-bold text-gray-900" id="totalEvents">-</p>
@@ -21,6 +38,13 @@
         <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
             <h3 class="text-gray-500 text-sm font-medium uppercase tracking-wider">High Risk Events</h3>
             <p class="mt-2 text-3xl font-bold text-red-600" id="highRiskEvents">-</p>
+        </div>
+        <!-- Chart Container -->
+        <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center justify-center">
+            <h3 class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-2 w-full text-center">Distribusi Risiko</h3>
+            <div class="relative w-full h-24">
+                <canvas id="riskChart"></canvas>
+            </div>
         </div>
     </div>
     
@@ -132,6 +156,10 @@
                         
                         <div class="mt-4">
                             <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">Waktu Skenario Terburuk:</span>
+                                <span id="detailWorstTime" class="text-sm font-bold text-gray-900"></span>
+                            </div>
+                            <div class="flex items-center justify-between mb-1 mt-2">
                                 <span class="text-sm font-medium text-gray-700">Tingkat Risiko Keseluruhan:</span>
                                 <span id="detailRiskBadge" class="px-3 py-1 rounded-full text-xs font-bold text-white"></span>
                             </div>
@@ -151,6 +179,23 @@
 
 {% block scripts %}
 <script>
+// Utility untuk escape HTML mencegah XSS
+const escapeHTML = (str) => {
+    return str.replace(/[&<>'"]/g, 
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag])
+    );
+};
+
+// Auto set min date to today for Create Event Form
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('startDate').setAttribute('min', today);
+document.getElementById('endDate').setAttribute('min', today);
 // Logic Modal
 const modal = document.getElementById('eventModal');
 const openBtn = document.getElementById('openModalBtn');
@@ -159,67 +204,202 @@ const closeBtn = document.getElementById('closeModalBtn');
 openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
 closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
 
+// Close modals if clicked outside
+window.addEventListener('click', (e) => {
+    if (e.target === modal) modal.classList.add('hidden');
+    if (e.target === detailModal) detailModal.classList.add('hidden');
+});
+
+// Notifications Logic
+const notifDropdownBtn = document.getElementById('notifDropdownBtn');
+const notifDropdown = document.getElementById('notifDropdown');
+const notifBadge = document.getElementById('notifBadge');
+const notifList = document.getElementById('notifList');
+
+notifDropdownBtn.addEventListener('click', () => {
+    notifDropdown.classList.toggle('hidden');
+});
+
+// Close dropdown if clicked outside
+window.addEventListener('click', (e) => {
+    if (!notifDropdownBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
+        notifDropdown.classList.add('hidden');
+    }
+});
+
+let riskChartInstance = null;
+
+async function loadNotifications() {
+    try {
+        const res = await fetch('/api/notifications', { credentials: 'include' });
+        if (res.ok) {
+            const notifs = await res.json();
+            const unread = notifs.filter(n => !n.is_read);
+            
+            if (unread.length > 0) {
+                notifBadge.textContent = unread.length;
+                notifBadge.classList.remove('hidden');
+            } else {
+                notifBadge.classList.add('hidden');
+            }
+            
+            if (notifs.length === 0) {
+                notifList.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500">Belum ada notifikasi</div>';
+            } else {
+                notifList.innerHTML = notifs.map(n => `
+                    <div class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 flex justify-between items-start ${n.is_read ? 'opacity-60' : 'bg-blue-50'}">
+                        <div>
+                            <p class="text-sm text-gray-800">${escapeHTML(n.message)}</p>
+                            <p class="text-xs text-gray-400 mt-1">${new Date(n.created_at).toLocaleString('id-ID')}</p>
+                        </div>
+                        ${!n.is_read ? `<button onclick="markNotifRead('${n.id}')" class="text-xs text-blue-600 hover:underline ml-2 flex-shrink-0">Tandai dibaca</button>` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+    } catch (e) {
+        console.error("Failed to load notifications", e);
+    }
+}
+
+window.markNotifRead = async (id) => {
+    try {
+        await fetch(`/api/notifications/${id}/read`, { method: 'PATCH', credentials: 'include' });
+        loadNotifications();
+    } catch (e) {
+        console.error(e);
+    }
+}
+
 // Helper load events & summary
 async function reloadDashboard() {
     // Load summary
     try {
-        const summaryRes = await fetch('/api/dashboard/summary'); 
+        const summaryRes = await fetch('/api/dashboard/summary', { credentials: 'include' }); 
         if (summaryRes.ok) {
             const summary = await summaryRes.json();
             document.getElementById('totalEvents').textContent = summary.total_events;
             document.getElementById('upcomingEvents').textContent = summary.upcoming_events;
             document.getElementById('highRiskEvents').textContent = summary.high_risk_events;
+            
+            // Render Chart
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            const low = summary.low_risk_events || 0;
+            const medium = summary.medium_risk_events || 0;
+            const high = summary.high_risk_events || 0;
+            
+            if (riskChartInstance) {
+                riskChartInstance.destroy();
+            }
+            
+            if (low + medium + high > 0) {
+                riskChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                        datasets: [{
+                            data: [low, medium, high],
+                            backgroundColor: ['#10B981', '#FBBF24', '#EF4444'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        cutout: '70%'
+                    }
+                });
+            } else {
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.font = "12px sans-serif";
+                ctx.fillStyle = "#9CA3AF";
+                ctx.textAlign = "center";
+                ctx.fillText("Belum ada data", ctx.canvas.width/2, ctx.canvas.height/2);
+            }
         }
     } catch (e) {
-        console.error("Failed to load summary", e);
+        showToast("Gagal memuat ringkasan", "error");
     }
     
     // Load events
     try {
-        const eventsRes = await fetch('/api/events');
+        const eventsRes = await fetch('/api/events', { credentials: 'include' });
         const eventList = document.getElementById('eventList');
         
         if (eventsRes.ok) {
             const events = await eventsRes.json();
             if (events.length === 0) {
-                eventList.innerHTML = '<li class="py-4 text-center text-gray-500">Belum ada acara yang ditambahkan.</li>';
+                eventList.innerHTML = '<li class="py-4 text-center text-gray-500">Belum ada acara yang dipantau.<br><span class="text-xs">Buat event pertama Anda untuk mulai menganalisis risiko cuaca.</span></li>';
             } else {
                 eventList.innerHTML = events.map(e => `
-                    <li class="py-4 flex justify-between items-center hover:bg-gray-50 px-2 rounded transition">
-                        <div class="cursor-pointer" onclick="viewEventDetail('${e.id}')">
-                            <p class="text-sm font-bold text-blue-600 truncate hover:underline">${e.name}</p>
-                            <p class="text-xs text-gray-500 mt-1">${e.start_date} s.d. ${e.end_date} | ${e.location}</p>
-                            <p class="text-xs text-gray-400 mt-0.5">Jam: ${e.start_time} - ${e.end_time}</p>
+                    <li class="py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center hover:bg-gray-50 px-4 rounded transition border-b border-gray-100 last:border-0">
+                        <div class="cursor-pointer flex-grow" onclick="viewEventDetail('${e.id}')">
+                            <p class="text-sm font-bold text-blue-600 truncate hover:underline">${escapeHTML(e.name)}</p>
+                            <p class="text-xs text-gray-500 mt-1">${e.start_date} s.d. ${e.end_date} | ${escapeHTML(e.location)}</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Jam: ${e.start_time.slice(0,5)} - ${e.end_time.slice(0,5)}</p>
                         </div>
-                        <div class="flex flex-col items-end space-y-2">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${e.forecast_status === 'AVAILABLE' ? 'bg-green-100 text-green-800' : (e.forecast_status === 'TOO_FAR' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800')}">
+                        <div class="flex items-center space-x-3 mt-3 sm:mt-0">
+                            <span class="px-2 py-1 text-xs leading-none font-semibold rounded-full ${e.forecast_status === 'AVAILABLE' ? 'bg-green-100 text-green-800' : (e.forecast_status === 'TOO_FAR' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800')}">
                                 ${e.forecast_status === 'AVAILABLE' ? 'Data Tersedia' : (e.forecast_status === 'TOO_FAR' ? 'Terlalu Jauh' : 'Sudah Lewat')}
                             </span>
-                            ${e.forecast_status === 'AVAILABLE' ? `<button onclick="refreshWeather('${e.id}')" class="text-xs text-blue-600 hover:text-blue-800 underline">Update Cuaca</button>` : ''}
+                            ${e.forecast_status === 'AVAILABLE' ? `<button onclick="refreshWeather('${e.id}', this)" class="text-xs text-blue-600 hover:text-blue-800 underline focus:outline-none">Update</button>` : ''}
+                            <button onclick="deleteEvent('${e.id}', this)" class="text-xs text-red-500 hover:text-red-700 underline focus:outline-none">Hapus</button>
                         </div>
                     </li>
                 `).join('');
             }
         }
     } catch (e) {
-        console.error("Failed to load events", e);
+        showToast("Gagal memuat daftar acara", "error");
     }
 }
 
+window.deleteEvent = async (eventId, btnElement) => {
+    if(confirm("Apakah Anda yakin ingin menghapus acara ini?")) {
+        const originalText = btnElement.textContent;
+        btnElement.textContent = 'Menghapus...';
+        btnElement.disabled = true;
+        try {
+            const res = await fetch(`/api/events/${eventId}`, { method: 'DELETE', credentials: 'include' });
+            if (res.ok) {
+                showToast("Acara berhasil dihapus");
+                reloadDashboard();
+            } else {
+                showToast("Gagal menghapus acara", "error");
+            }
+        } catch(e) {
+            showToast("Gagal menghubungi server", "error");
+            btnElement.textContent = originalText;
+            btnElement.disabled = false;
+        }
+    }
+};
+
 // Global func to refresh weather
-window.refreshWeather = async (eventId) => {
+window.refreshWeather = async (eventId, btnElement) => {
+    showToast("Memperbarui cuaca...", "info");
+    if(btnElement) {
+        btnElement.textContent = 'Updating...';
+        btnElement.disabled = true;
+    }
     try {
-        alert("Sedang memperbarui data cuaca...");
-        const res = await fetch(`/api/events/${eventId}/weather/refresh`, { method: 'POST' });
+        const res = await fetch(`/api/events/${eventId}/weather/refresh`, { method: 'POST', credentials: 'include' });
         if (res.ok) {
-            alert("Berhasil memperbarui data cuaca!");
+            showToast("Berhasil memperbarui data cuaca!");
             reloadDashboard();
+            loadNotifications();
         } else {
             const data = await res.json();
-            alert("Gagal: " + (data.detail || "Terjadi kesalahan"));
+            showToast("Gagal: " + (data.detail || "Terjadi kesalahan"), "error");
         }
     } catch(e) {
-        alert("Gagal menghubungi server");
+        showToast("Gagal menghubungi server", "error");
+    } finally {
+        if(btnElement) {
+            btnElement.textContent = 'Update';
+            btnElement.disabled = false;
+        }
     }
 };
 
@@ -234,7 +414,7 @@ document.getElementById('createEventForm').addEventListener('submit', async (e) 
     const payload = {
         name: document.getElementById('eventName').value,
         location: document.getElementById('eventLocation').value,
-        timezone: "Asia/Jakarta",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         start_date: document.getElementById('startDate').value,
         end_date: document.getElementById('endDate').value,
         start_time: document.getElementById('startTime').value + ":00",
@@ -248,12 +428,14 @@ document.getElementById('createEventForm').addEventListener('submit', async (e) 
         const res = await fetch('/api/events', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(payload)
         });
         
         if (res.ok) {
             modal.classList.add('hidden');
             document.getElementById('createEventForm').reset();
+            showToast("Acara berhasil dibuat!");
             reloadDashboard();
         } else {
             const data = await res.json();
@@ -291,8 +473,7 @@ window.viewEventDetail = async (eventId) => {
     document.getElementById('hasRiskData').classList.add('hidden');
     
     try {
-        // Fetch event details and latest risk
-        const res = await fetch(`/api/events/${eventId}/details`);
+        const res = await fetch(`/api/events/${eventId}/details`, { credentials: 'include' });
         if (res.ok) {
             const data = await res.json();
             
@@ -303,8 +484,9 @@ window.viewEventDetail = async (eventId) => {
             if (data.risk && data.weather) {
                 document.getElementById('hasRiskData').classList.remove('hidden');
                 document.getElementById('detailTemp').textContent = `${data.weather.temperature || '-'} °C`;
-                document.getElementById('detailRain').textContent = `${(data.weather.rain_probability || 0) * 100} %`;
+                document.getElementById('detailRain').textContent = `${Math.round((data.weather.rain_probability || 0) * 100)} %`;
                 document.getElementById('detailWind').textContent = `${data.weather.wind_speed || '-'} m/s`;
+                document.getElementById('detailWorstTime').textContent = data.weather.worst_case_time ? data.weather.worst_case_time.substring(11, 16) : '-';
                 
                 const badge = document.getElementById('detailRiskBadge');
                 badge.textContent = data.risk.overall_risk;
@@ -321,19 +503,25 @@ window.viewEventDetail = async (eventId) => {
             document.getElementById('detailContent').classList.remove('hidden');
         } else {
             detailModal.classList.add('hidden');
-            alert("Gagal mengambil detail acara");
+            showToast("Gagal mengambil detail acara", "error");
         }
     } catch(e) {
         detailModal.classList.add('hidden');
-        alert("Gagal menghubungi server");
+        showToast("Gagal menghubungi server", "error");
     }
 };
 
-document.addEventListener('DOMContentLoaded', reloadDashboard);
+document.addEventListener('DOMContentLoaded', () => {
+    reloadDashboard();
+    loadNotifications();
+    // Auto refresh notifications every 30s
+    setInterval(loadNotifications, 30000);
+});
+
 // Logout
 document.getElementById('logoutBtn').addEventListener('click', async (e) => {
     e.preventDefault();
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
     window.location.href = '/login';
 });
 </script>

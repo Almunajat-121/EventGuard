@@ -15,7 +15,7 @@ console = Console()
 settings = get_settings()
 
 @app.command()
-def check(city: str):
+def check(city: str = typer.Option(..., "--city", help="City to fetch weather for")):
     """
     Fetch current weather forecast for a specific city.
     """
